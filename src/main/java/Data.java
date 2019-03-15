@@ -125,7 +125,8 @@ public class Data {
         return cpe23Uri;
     }
 
-    public class VendorData
+    // private classes within Data class
+    private class VendorData
     {
         private String vendorName;
         private ArrayList<ProductData> productData;
@@ -163,7 +164,7 @@ public class Data {
         }
     }
 
-    public class ProductData{
+    private class ProductData{
         private String productName;
         private ArrayList<VersionData> versionData;
 
@@ -200,7 +201,7 @@ public class Data {
         }
     }
 
-    public class VersionData{
+    private class VersionData{
         private String version_value;
         private String version_affected;
 

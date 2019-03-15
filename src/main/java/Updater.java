@@ -1,6 +1,6 @@
-public class Update {
-
+public class Updater {
     static private String updateDate;
+    static private String[] updatedVersion={"recent", "modified"};
 
     public static void udpateCheck()
     {
@@ -24,4 +24,5 @@ public class Update {
             Crawler.fileUrlDownload(url, Crawler.fileName);
         }
     }
+
 }

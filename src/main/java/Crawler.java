@@ -13,17 +13,16 @@ import java.io.File;
 public class Crawler {
 
     final static int size = 1024*8;
-    static String fileName;
-    static String macDownloadDir="/Users/GyuMac/Desktop/회사/멘토링/data/ZIP/";
-    static String winDownloadDir="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/ZIP/";
-    static String downloadDir=winDownloadDir;
+    static private String fileName;
+    static private String macDownloadDir="/Users/GyuMac/Desktop/회사/멘토링/data/ZIP/";
+    static private String winDownloadDir="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/ZIP/";
+    static private String downloadDir=winDownloadDir;
 
-    static String defaultAddress= "https://nvd.nist.gov/feeds/json/cve/1.0/nvdcve-1.0-";
-    static String[] version={"2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012","2013","2014","2015","2016","2017","2018","2019","recent", "modified"};
-    static String[] updatedVersion={"recent", "modified"};
-    static String fileFormat=".json.zip";
+    static private String defaultAddress= "https://nvd.nist.gov/feeds/json/cve/1.0/nvdcve-1.0-";
+    static private String[] version={"2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012","2013","2014","2015","2016","2017","2018","2019","recent", "modified"};
 
-    static String downloadDate;
+    static private String fileFormat=".json.zip";
+    static private String downloadDate;
 
 
     public static void fileUrlDownload(String fileAddress, String localFileName)
@@ -96,8 +95,31 @@ public class Crawler {
         SimpleDateFormat date=new SimpleDateFormat("yyyy-MM-dd");
         downloadDate=date.format(today);
     }
-    public static void main(String[] args) {
 
+    /*
+    public static String getDownloadDir()
+    {
+        return downloadDir;
+    }
+
+    public static String[] getVersion()
+    {
+        return version;
+    }
+
+    public static void setDownloadDate(String date)
+    {
+        downloadDate=date;
+    }
+
+    public static String getDownloadDate()
+    {
+        return downloadDate;
+    }
+*/
+
+    public static void crawl()
+    {
         timeLog();
         String downDir=downloadDir+downloadDate+"/";
 
