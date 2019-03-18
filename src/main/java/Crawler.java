@@ -94,6 +94,7 @@ public class Crawler {
         Date today=new Date();
         SimpleDateFormat date=new SimpleDateFormat("yyyy-MM-dd");
         downloadDate=date.format(today);
+
     }
 
     /*

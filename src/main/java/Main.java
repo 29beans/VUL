@@ -14,7 +14,8 @@ public class Main {
     static String winOutputPath = "C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/output/";
     static String outputPath=winOutputPath;
 
-    static String
+    static private String updateLogPath = "/Users/GyuMac/Desktop/회사/멘토링/data/";
+    static private File updateLog = new File(updateLogPath+"update_log.txt");
 
     private static String[] getJsonFileList(String dirPath)
     {
@@ -61,7 +62,7 @@ public class Main {
                     break;
                 case 2:
                     Decompressor dcmp = new Decompressor();
-                    dcmp.
+                    dcmp.decompress();
                     break;
                 case 3:
                     Updater updt= new Updater();
@@ -86,24 +87,6 @@ public class Main {
                     System.out.println("Unexpected option input!");
                     break;
             }
-        }
-
-        for(String file: jsonFileList)
-        {
-            DataParser dp = new DataParser();
-
-            if(file.startsWith(".")) //To deal with file error in MacOS (.DS_STORE)
-                continue;
-
-            System.out.println("------- Parsing Start ------- (File: "+file+")");
-            dp.parser(jsonPath, file);
-            dp.writeJsonResult(new File(outputPath+file));  // Write parsing result to Json file
-            //System.out.println("Items: "+dp.getDataList().size());
-
-            //Below is the code line for returning and storing parsed data list of Json file (format: List<Map<String, Object>>)
-            //To handle memory error, the data list of one Json file will be returned for each iteration of for-loop
-
-            //WHERE_YOU_WANT_TO_KEEP_DATA = dp.getDataList();   // Return type: List<Map<String,Object>>
         }
     }
 }

@@ -3,45 +3,63 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.ArrayList;
 
 
 public class Decompressor {
 
     static private String macFileDir="/Users/GyuMac/Desktop/회사/멘토링/data/ZIP/";
     static private String winFileDir="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/ZIP/";
-    static private File fileDir=new File(winFileDir);
+    static private File fileDir=new File(macFileDir);
 
     static private String macOutputDir="/Users/GyuMac/Desktop/회사/멘토링/data/JSON/";
     static private String winOutputDir="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/JSON/";
-    static private File outputDir=new File(winOutputDir);
+    static private File outputDir=new File(macOutputDir);
 
     static private File[] folderList;
-    static private File[] zipFileList;
+    static private ArrayList<File[]> zipFileList = new ArrayList<>();
 
     public static void decompress()
     {
-        for(File zipFile:zipFileList)
+        decompressSetting();
+
+        for(File[] zipFiles:zipFileList)
         {
-            try {
-                unzip(zipFile, new File(outputDir+zipFile.getParentFile().getName()+"/"));
-                System.out.println("Decompressed!: "+ zipFile.getAbsolutePath());
-            } catch (Throwable e) {
-                e.printStackTrace();
+            String newFolderName = zipFiles[0].getParentFile().getName();
+
+            for(File zipFile: zipFiles) {
+
+                if(zipFile.getName().startsWith(".")) //To deal with file error in MacOS (.DS_STORE)
+                    continue;
+
+                try {
+                    unzip(zipFile, new File(outputDir, newFolderName));
+                    System.out.println("Decompressed!: " + zipFile.getAbsolutePath());
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
-    public static void setting()
+    public static void decompressSetting()
     {
         folderList=fileDir.listFiles();
+
         for(File folder: folderList)
         {
-            if(!folder.isDirectory())
+            if(folder.getName().startsWith(".")) //To deal with file error in MacOS (.DS_STORE)
+                continue;
+            //System.out.println(folder.getName());
+
+            File outputDirFolder=new File(outputDir, folder.getName());
+            if(!outputDirFolder.isDirectory())
             {
-                zipFileList=folder.listFiles();
+                zipFileList.add(folder.listFiles());
             }
         }
     }
+
     public static void unzip(File zipFile, File unzipDir) throws Throwable
     {
         FileInputStream fis =null;
@@ -54,8 +72,11 @@ public class Decompressor {
 
             while ((ze = zis.getNextEntry()) != null) {
                 String fileName = ze.getName();
-                File file = new File(unzipDir, fileName);
                 //System.out.println(fileName);
+                if(fileName.startsWith(".")) //To deal with file error in MacOS (.DS_STORE)
+                    continue;
+
+                File file = new File(unzipDir, fileName);
 
                 if (ze.isDirectory()) {
                     file.mkdirs();
@@ -80,6 +101,7 @@ public class Decompressor {
         if(!parentDir.exists())
         {
             System.out.println("Parent Dir Missing!");
+            System.out.println("Create Path : "+parentDir.getAbsolutePath()+"\n");
             parentDir.mkdirs();
         }
 
@@ -95,35 +117,6 @@ public class Decompressor {
         }catch(Throwable e)
         {
             throw e;
-        }
-    }
-
-
-
-
-    public static void main(String[] args)
-    {
-        for(String folderName:folderList)
-        {
-            File dir=new File(outputDir+folderName);
-
-            if(!dir.isDirectory())
-            {
-                zipFileList=readTargetFileList(fileDir+folderName);
-
-                for(String zipFileName:zipFileList)
-                {
-                    File zipFile = new File(fileDir+folderName+"/"+zipFileName);
-
-                    try {
-                        decompress(zipFile, outputDir+folderName+"/");
-                        System.out.println("Decompressed!: "+ zipFile.getAbsolutePath());
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                    }
-                }
-
-            }
         }
     }
 }
