@@ -6,16 +6,41 @@ public class Main {
 
     //Below are the hard-coded absolute paths for json file input and output
     //Modify the paths for your own convenience
-    static String macJsonPath="/Users/GyuMac/Desktop/회사/멘토링/data/JSON/";
-    static String winJsonPath="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/JSON/2019-02-08/";
-    static String jsonPath=winJsonPath;
+
+    // Parameter Setting for Crawler Class
+    static private String macDownloadDir="/Users/GyuMac/Desktop/회사/멘토링/data/ZIP/";
+    static private String winDownloadDir="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/ZIP/";
+    static private File crawlingDir=new File(winDownloadDir);
+    //End
+
+    // Parameter Setting for Decompressor Class
+    static private String macFileDir=macDownloadDir;
+    static private String winFileDir=winDownloadDir;
+    static private File zipFileDir=new File(winFileDir);
+
+    static private String macOutputDir="/Users/GyuMac/Desktop/회사/멘토링/data/JSON/";
+    static private String winOutputDir="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/JSON/";
+    static private File decompressDir=new File(winOutputDir);
+    //End
+
+    // Parameter Setting for Updater Class
+    static private File updateDir = crawlingDir;
+    static private String macUpdateLogPath ="/Users/GyuMac/Desktop/회사/멘토링/data/";
+    static private String winUpdateLogPath = "C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/";
+    static private String updateLogPath = winUpdateLogPath;
+    static private File cve_modified_update_log_file = new File(updateLogPath+"cve_modified_update_log.txt");
+    static private File cve_recent_update_log_file = new File(updateLogPath+"cve_recent_update_log.txt");
+    //End
+
+    // Parameter Setting for DataParser Class
+    static String macDataPath="/Users/GyuMac/Desktop/회사/멘토링/data/JSON/";
+    static String winDataPath="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/JSON/";
+    static String dataPath=winDataPath;
 
     static String macOutputPath="/Users/GyuMac/Desktop/회사/멘토링/data/output/";
     static String winOutputPath = "C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/output/";
     static String outputPath=winOutputPath;
-
-    static private String updateLogPath = "/Users/GyuMac/Desktop/회사/멘토링/data/";
-    static private File updateLog = new File(updateLogPath+"update_log.txt");
+    //End
 
     private static String[] getJsonFileList(String dirPath)
     {
@@ -46,8 +71,6 @@ public class Main {
 
     public static void main(String[] args) throws IOException
     {
-        String[] jsonFileList=getJsonFileList(jsonPath);
-
         while(true)
         {
             int opt = menu();
@@ -57,15 +80,16 @@ public class Main {
             switch (opt)
             {
                 case 1:
-                    Crawler crwl = new Crawler();
-                    crwl.crawl();
+                    Crawler crwl = new Crawler(crawlingDir);
+                    crwl.crawl(cve_modified_update_log_file, cve_recent_update_log_file);
                     break;
                 case 2:
-                    Decompressor dcmp = new Decompressor();
+                    Decompressor dcmp = new Decompressor(zipFileDir, decompressDir);
                     dcmp.decompress();
                     break;
                 case 3:
-                    Updater updt= new Updater();
+                    Updater updt= new Updater(cve_modified_update_log_file, cve_recent_update_log_file);
+                    updt.update(updateDir);
                     break;
                 case 4:
                     for(String file: jsonFileList)
@@ -76,11 +100,6 @@ public class Main {
                         System.out.println("------- Parsing Start ------- (File: "+file+")");
                         dp.parser(jsonPath, file);
                         dp.writeJsonResult(new File(outputPath+file));  // Write parsing result to Json file
-
-                        //Below is the code line for returning and storing parsed data list of Json file (format: List<Map<String, Object>>)
-                        //To handle memory error, the data list of one Json file will be returned for each iteration of for-loop
-
-                        //WHERE_YOU_WANT_TO_KEEP_DATA = dp.getDataList();   // Return type: List<Map<String,Object>>
                     }
                     break;
                 default:

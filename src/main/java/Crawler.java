@@ -1,22 +1,20 @@
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Date;
+import java.util.*;
 import java.text.SimpleDateFormat;
-import java.io.File;
 
 
 public class Crawler {
 
     final static int size = 1024*8;
     static private String fileName;
-    static private String macDownloadDir="/Users/GyuMac/Desktop/회사/멘토링/data/ZIP/";
-    static private String winDownloadDir="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/ZIP/";
-    static private String downloadDir=winDownloadDir;
+    static private File downloadDir;
 
     static private String defaultAddress= "https://nvd.nist.gov/feeds/json/cve/1.0/nvdcve-1.0-";
     static private String[] version={"2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012","2013","2014","2015","2016","2017","2018","2019","recent", "modified"};
@@ -24,6 +22,14 @@ public class Crawler {
     static private String fileFormat=".json.zip";
     static private String downloadDate;
 
+    static private String updateUrl = "https://nvd.nist.gov/vuln/data-feeds";
+    static private Map<String,String> updateMsg =  new HashMap<String, String>();
+    static private Map<String, File> logFile = new HashMap<String, File>();
+
+    public Crawler(File crawlDir)
+    {
+        downloadDir=crawlDir;
+    }
 
     public static void fileUrlDownload(String fileAddress, String localFileName)
     {
@@ -31,9 +37,8 @@ public class Crawler {
         URLConnection uCon = null;
         InputStream inStream = null;
 
-        File dir= new File(downloadDir);
-        if(!dir.exists())
-            dir.mkdirs();
+        if(!downloadDir.exists())
+            downloadDir.mkdirs();
 
         try
         {
@@ -43,7 +48,7 @@ public class Crawler {
             int byteRead;
             int byteWritten=0;
 
-            outStream=new BufferedOutputStream(new FileOutputStream(downloadDir+localFileName));
+            outStream=new BufferedOutputStream(new FileOutputStream(downloadDir.getAbsolutePath()+"/"+localFileName));
             uCon=url.openConnection();
             inStream = uCon.getInputStream();
             buf = new byte[size];
@@ -75,13 +80,12 @@ public class Crawler {
         }
     }
 
-    public static void downloadSetting(String fileAddress, String downDir)
+    public static void downloadSetting(String fileAddress)
     {
         int slashIndex = fileAddress.lastIndexOf('/');
         int periodIndex= fileAddress.lastIndexOf('.');
 
         fileName=fileAddress.substring(slashIndex+1);
-        downloadDir=downDir;
 
         if(!(periodIndex >= 1 && slashIndex >= 0 && slashIndex < fileAddress.length() -1))
         {
@@ -94,32 +98,69 @@ public class Crawler {
         Date today=new Date();
         SimpleDateFormat date=new SimpleDateFormat("yyyy-MM-dd");
         downloadDate=date.format(today);
-
     }
 
-    /*
-    public static String getDownloadDir()
+    public static void updateTimeCheck()
     {
-        return downloadDir;
+        Document doc = null;
+        try{
+            doc = Jsoup.connect(updateUrl).get();
+        }catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        Elements elements = doc.getElementsByClass("xml-feed-table table table-striped table-condensed");
+        Elements body=elements.first().getElementsByTag("tbody").get(0).getElementsByTag("td");
+        String cve_modified_update_time = body.get(1).text();
+        String cve_recent_update_time = body.get(8).text();
+
+        updateMsg.put("CVE_Modified", cve_modified_update_time);
+        updateMsg.put("CVE_Recent", cve_recent_update_time);
     }
 
-    public static String[] getVersion()
+    public static void updateLog()
     {
-        return version;
+        FileWriter fw_modified=null;
+        FileWriter fw_recent=null;
+        try{
+            fw_modified=new FileWriter(logFile.get("CVE_Modified"), true);
+            fw_modified.write(updateMsg.get("CVE_Modified")+"\n");
+            fw_modified.flush();
+
+            fw_recent=new FileWriter(logFile.get("CVE_Recent"), true);
+            fw_recent.write(updateMsg.get("CVE_Recent")+"\n");
+            fw_recent.flush();
+        }catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            try{
+                if(fw_modified != null)
+                    fw_modified.close();
+                if(fw_recent != null)
+                    fw_recent.close();
+            }catch(IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
-    public static void setDownloadDate(String date)
+    public static void setVersion(String[] ver)
     {
-        downloadDate=date;
+        version = ver;
     }
 
-    public static String getDownloadDate()
+    public static void setLogFile(File modified_log_file, File recent_log_file)
     {
-        return downloadDate;
+        logFile.put("CVE_Modified", modified_log_file);
+        logFile.put("CVE_Recent", recent_log_file);
     }
-*/
 
-    public static void crawl()
+    public static void crawl(File modified_log_file, File recent_log_file)
     {
         timeLog();
         String downDir=downloadDir+downloadDate+"/";
@@ -127,9 +168,13 @@ public class Crawler {
         for(String ver:version)
         {
             String url= defaultAddress+ver+fileFormat;
-            downloadSetting(url, downDir);
+            downloadSetting(url);
             fileUrlDownload(url, fileName);
-
         }
+
+        System.out.println("[Crawling] All files are successfully done!");
+        setLogFile(modified_log_file, recent_log_file);
+        updateTimeCheck();
+        updateLog();
     }
 }

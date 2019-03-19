@@ -8,16 +8,17 @@ import java.util.ArrayList;
 
 public class Decompressor {
 
-    static private String macFileDir="/Users/GyuMac/Desktop/회사/멘토링/data/ZIP/";
-    static private String winFileDir="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/ZIP/";
-    static private File fileDir=new File(macFileDir);
-
-    static private String macOutputDir="/Users/GyuMac/Desktop/회사/멘토링/data/JSON/";
-    static private String winOutputDir="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/JSON/";
-    static private File outputDir=new File(macOutputDir);
+    static private File zipFileDir;
+    static private File decompressDir;
 
     static private File[] folderList;
     static private ArrayList<File[]> zipFileList = new ArrayList<>();
+
+    public Decompressor(File zipDir, File decompDir)
+    {
+        zipFileDir = zipDir;
+        decompressDir = decompDir;
+    }
 
     public static void decompress()
     {
@@ -33,7 +34,7 @@ public class Decompressor {
                     continue;
 
                 try {
-                    unzip(zipFile, new File(outputDir, newFolderName));
+                    unzip(zipFile, new File(decompressDir, newFolderName));
                     System.out.println("Decompressed!: " + zipFile.getAbsolutePath());
                 } catch (Throwable e) {
                     e.printStackTrace();
@@ -44,15 +45,14 @@ public class Decompressor {
 
     public static void decompressSetting()
     {
-        folderList=fileDir.listFiles();
+        folderList=zipFileDir.listFiles();
 
         for(File folder: folderList)
         {
             if(folder.getName().startsWith(".")) //To deal with file error in MacOS (.DS_STORE)
                 continue;
-            //System.out.println(folder.getName());
 
-            File outputDirFolder=new File(outputDir, folder.getName());
+            File outputDirFolder=new File(decompressDir, folder.getName());
             if(!outputDirFolder.isDirectory())
             {
                 zipFileList.add(folder.listFiles());
