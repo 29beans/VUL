@@ -100,7 +100,7 @@ public class Crawler {
         downloadDate=date.format(today);
     }
 
-    public static void updateTimeCheck()
+    public static void updateTimeCheck(Map<String, String> updateMsg)
     {
         Document doc = null;
         try{
@@ -174,7 +174,7 @@ public class Crawler {
 
         System.out.println("[Crawling] All files are successfully done!");
         setLogFile(modified_log_file, recent_log_file);
-        updateTimeCheck();
+        updateTimeCheck(updateMsg);
         updateLog();
     }
 }

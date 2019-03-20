@@ -26,7 +26,7 @@ public class Main {
     // Parameter Setting for Updater Class
     static private File updateDir = crawlingDir;
     static private String macUpdateLogPath ="/Users/GyuMac/Desktop/회사/멘토링/data/";
-    static private String winUpdateLogPath = "C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/";
+    static private String winUpdateLogPath = "C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/Update_Log/";
     static private String updateLogPath = winUpdateLogPath;
     static private File cve_modified_update_log_file = new File(updateLogPath+"cve_modified_update_log.txt");
     static private File cve_recent_update_log_file = new File(updateLogPath+"cve_recent_update_log.txt");
@@ -92,6 +92,7 @@ public class Main {
                     updt.update(updateDir);
                     break;
                 case 4:
+                    /*
                     for(String file: jsonFileList)
                     {
                         DataParser dp = new DataParser();
@@ -100,7 +101,7 @@ public class Main {
                         System.out.println("------- Parsing Start ------- (File: "+file+")");
                         dp.parser(jsonPath, file);
                         dp.writeJsonResult(new File(outputPath+file));  // Write parsing result to Json file
-                    }
+                    }*/
                     break;
                 default:
                     System.out.println("Unexpected option input!");
