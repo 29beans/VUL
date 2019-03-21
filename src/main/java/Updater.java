@@ -40,7 +40,7 @@ public class Updater {
             e.printStackTrace();
         }
 
-        if(updateMsg.get("CVE_Modified").equals(lastModifiedUpdateTime) && updateMsg.get("CVE_Recent").equals(lastRecentUpdateTime))
+        if(!(updateMsg.get("CVE_Modified").equals(lastModifiedUpdateTime)) || !(updateMsg.get("CVE_Recent").equals(lastRecentUpdateTime)))
             return true;
         else
             return false;
@@ -52,6 +52,9 @@ public class Updater {
             Crawler crwl = new Crawler(updateDir);
             crwl.setVersion(updatedVersion);
             crwl.crawl(cve_modified_log_file, cve_recent_log_file);
+        }else
+        {
+            System.out.println("Data feeds are up-to-date! No updates are required!");
         }
     }
 }

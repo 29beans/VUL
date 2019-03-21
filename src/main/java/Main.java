@@ -11,7 +11,7 @@ public class Main {
     static private String macDownloadDir="/Users/GyuMac/Desktop/회사/멘토링/data/ZIP/";
     static private String winDownloadDir="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/ZIP/";
     static private File crawlingDir=new File(winDownloadDir);
-    //End
+    //End of Crawler Setting
 
     // Parameter Setting for Decompressor Class
     static private String macFileDir=macDownloadDir;
@@ -21,7 +21,7 @@ public class Main {
     static private String macOutputDir="/Users/GyuMac/Desktop/회사/멘토링/data/JSON/";
     static private String winOutputDir="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/JSON/";
     static private File decompressDir=new File(winOutputDir);
-    //End
+    //End of Decompressor Setting
 
     // Parameter Setting for Updater Class
     static private File updateDir = crawlingDir;
@@ -30,23 +30,17 @@ public class Main {
     static private String updateLogPath = winUpdateLogPath;
     static private File cve_modified_update_log_file = new File(updateLogPath+"cve_modified_update_log.txt");
     static private File cve_recent_update_log_file = new File(updateLogPath+"cve_recent_update_log.txt");
-    //End
+    //End of Updater Setting
 
     // Parameter Setting for DataParser Class
-    static String macDataPath="/Users/GyuMac/Desktop/회사/멘토링/data/JSON/";
-    static String winDataPath="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/JSON/";
-    static String dataPath=winDataPath;
+    static private String macDataPath="/Users/GyuMac/Desktop/회사/멘토링/data/JSON/";
+    static private String winDataPath="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/JSON/";
+    static private File jsonDataDir=new File(winDataPath);
 
-    static String macOutputPath="/Users/GyuMac/Desktop/회사/멘토링/data/output/";
-    static String winOutputPath = "C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/output/";
-    static String outputPath=winOutputPath;
-    //End
-
-    private static String[] getJsonFileList(String dirPath)
-    {
-        File dir=new File(dirPath);
-        return dir.list();
-    }
+    static private String macOutputPath="/Users/GyuMac/Desktop/회사/멘토링/data/output/";
+    static private String winOutputPath = "C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/output/";
+    static private File parsedOutputDir=new File(winOutputPath);
+    //End of DataParser Setting
 
     private static int menu()
     {
@@ -69,12 +63,12 @@ public class Main {
         System.out.print("Enter: ");
     }
 
-    public static void main(String[] args) throws IOException
+    public static void main(String[] args)
     {
         while(true)
         {
             int opt = menu();
-            if(opt == 5)
+            if(opt == 5)   // 'Exit' selected
                 break;
 
             switch (opt)
@@ -92,16 +86,8 @@ public class Main {
                     updt.update(updateDir);
                     break;
                 case 4:
-                    /*
-                    for(String file: jsonFileList)
-                    {
-                        DataParser dp = new DataParser();
-                        if (file.startsWith(".")) //To deal with file error in MacOS (.DS_STORE)
-                            continue;
-                        System.out.println("------- Parsing Start ------- (File: "+file+")");
-                        dp.parser(jsonPath, file);
-                        dp.writeJsonResult(new File(outputPath+file));  // Write parsing result to Json file
-                    }*/
+                    DataParser dp = new DataParser(jsonDataDir, parsedOutputDir);
+                    dp.parse();
                     break;
                 default:
                     System.out.println("Unexpected option input!");

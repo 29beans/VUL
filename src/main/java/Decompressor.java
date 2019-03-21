@@ -101,7 +101,7 @@ public class Decompressor {
         if(!parentDir.exists())
         {
             System.out.println("Parent Dir Missing!");
-            System.out.println("Create Path : "+parentDir.getAbsolutePath()+"\n");
+            System.out.println("Create Path : "+parentDir.getAbsolutePath());
             parentDir.mkdirs();
         }
 

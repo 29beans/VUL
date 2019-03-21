@@ -28,7 +28,8 @@ public class Crawler {
 
     public Crawler(File crawlDir)
     {
-        downloadDir=crawlDir;
+        timeLog();
+        downloadDir=new File(crawlDir,downloadDate);
     }
 
     public static void fileUrlDownload(String fileAddress, String localFileName)
@@ -162,9 +163,6 @@ public class Crawler {
 
     public static void crawl(File modified_log_file, File recent_log_file)
     {
-        timeLog();
-        String downDir=downloadDir+downloadDate+"/";
-
         for(String ver:version)
         {
             String url= defaultAddress+ver+fileFormat;
