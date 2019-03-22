@@ -70,11 +70,11 @@ public class DataParser {
 
     public void parsingDirCheck()
     {
-        for(String dir:parseDirList)
+        for(Iterator<String> it = parseDirList.iterator() ; it.hasNext() ; )
         {
+            String dir = it.next();
             if(Arrays.asList(outputDir.list()).contains(dir))
-            {}
-                //parseDirList.remove(dir);
+                it.remove();
         }
     }
 
@@ -121,6 +121,10 @@ public class DataParser {
             fw=new FileWriter(jsonFile);
             gson.toJson(dataList, fw);
         }catch(Exception e) {e.printStackTrace();}
-        finally { fw.close();}
+        finally
+        {
+            fw.close();
+            System.out.println("[Data Parsing] Done: "+jsonFile.getParentFile().getAbsolutePath());
+        }
     }
 }
