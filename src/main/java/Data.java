@@ -8,7 +8,7 @@ public class Data {
 
     private String CVE_ID;
     private ArrayList<VendorData> vendorData;
-    private ArrayList<String> CWE;
+    private Map<String, Object> CWE;
     private ArrayList<String> description;
     private ArrayList<String> cpe23Uri;
 
@@ -16,7 +16,7 @@ public class Data {
 
     public Data() {
         vendorData = new ArrayList<VendorData>();
-        CWE=new ArrayList<String>();
+        CWE=new HashMap<String, Object>();    // key : value --> CWE_ID : vulnerability name
         description=new ArrayList<String>();
         cpe23Uri = new ArrayList<String>();
 
@@ -38,7 +38,7 @@ public class Data {
         }
     }
 
-    public void addCWE(JsonArray ja)
+    public void addCWE(JsonArray ja, Map<String,Object> cweInfo)
     {
         for(JsonElement je: ja)
         {
@@ -47,7 +47,7 @@ public class Data {
             for(JsonElement je_next: ja_next)
             {
                 String CWE_ID=je_next.getAsJsonObject().get("value").getAsString();
-                CWE.add(CWE_ID);
+                CWE.put(CWE_ID, cweInfo.get(CWE_ID));
             }
         }
     }

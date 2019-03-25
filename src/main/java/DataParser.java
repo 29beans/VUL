@@ -1,23 +1,30 @@
 import java.io.*;
 import com.google.gson.*;
 import java.util.*;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 public class DataParser {
 
-    //private ArrayList<Data> dataList;
-    //private Data tempData;
     static private File dataDir;
     static private File outputDir;
+    static private File cweCSV;
+    static private File cweToCve;
     static private ArrayList<String> parseDirList;
     static private List<Map<String, Object>> dataList;
-    static private Map<String, Object> tempMap;
     static private Data tempData;
 
+    static private Map<String, Object> cweInfo;
 
-    public DataParser(File jsonDataDir, File parsedOutputDir)
+
+    public DataParser(File jsonDataDir, File parsedOutputDir, File cweCsvFile, File cweToCveCsv)
     {
         dataDir =jsonDataDir;
         outputDir=parsedOutputDir;
+        cweCSV=cweCsvFile;
+        cweToCve=cweToCveCsv;
+        cweInfo=new HashMap<String, Object>();
         parseDirList = new ArrayList<>();
         for(String dir: dataDir.list())
             parseDirList.add(dir);
@@ -26,6 +33,7 @@ public class DataParser {
     public void parse()
     {
         parsingDirCheck();
+        parseCweInfoFromCSV(cweCSV);
         Gson gson = new Gson();
 
         for(String dir: parseDirList)
@@ -53,11 +61,11 @@ public class DataParser {
 
                     tempData = new Data();
 
-                    parseCVE(cveObj);
-                    parseVendorData(vendorArr);
-                    parseCWE(cweArr);
-                    parseDescription(dsctArr);
-                    parseCpe(nodesArr);
+                    parseCVE(tempData, cveObj);
+                    parseVendorData(tempData, vendorArr);
+                    parseCWE(tempData, cweArr, cweInfo);
+                    parseDescription(tempData, dsctArr);
+                    parseCpe(tempData, nodesArr);
 
                     dataList.add(tempData.createMap());
                 }
@@ -65,6 +73,55 @@ public class DataParser {
                 try{ writeJsonResult(new File(outputDir.getAbsolutePath() + "/" + jsonFile.getParentFile().getName() + "/" + jsonFile.getName()));}
                 catch(IOException e) { e.printStackTrace(); }
             }
+        }
+    }
+
+    public void recordCweToCve(File cweToCve)
+    {
+
+    }
+
+    public void parseCweInfoFromCSV(File csv)
+    {
+        try {
+            Reader reader = new FileReader(csv);
+            CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader());
+
+            for(CSVRecord csvRecord: csvParser)
+            {
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("Name", csvRecord.get("Name"));
+                ArrayList<String> arr=new ArrayList<String>();
+                splitWeaknesses(csvRecord.get("Related Weaknesses"),arr);
+                map.put("Related Weaknesses", arr);+
+                map.put("CVE-ID", new HashSet<String>());
+                cweInfo.put(csvRecord.get("CWE-ID"), map);
+            }
+        }catch(FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private void splitWeaknesses(String weaknesses, ArrayList<String> arr)
+    {
+        int start_idx=weaknesses.indexOf("CWE ID:");
+        if(start_idx == -1)
+            return;
+        else
+        {
+            int end_idx=weaknesses.indexOf(":",start_idx+7);
+
+            if(end_idx == -1)
+                System.out.println("Error in extracting CWE-ID.... end_idx error!");
+
+            String id= weaknesses.substring(start_idx+7, end_idx);
+            arr.add(id);
+            splitWeaknesses(weaknesses.substring(end_idx), arr);
         }
     }
 
@@ -83,27 +140,27 @@ public class DataParser {
         return dataList;
     }
 
-    private void parseCVE(JsonObject jObject)
+    private void parseCVE(Data tempData, JsonObject jObject)
     {
         tempData.setCVE_ID(jObject.get("ID").getAsString());
     }
 
-    private void parseVendorData(JsonArray jArray)
+    private void parseVendorData(Data tempData, JsonArray jArray)
     {
         tempData.addVendorData(jArray);
     }
 
-    private void parseCWE(JsonArray jArray)
+    private void parseCWE(Data tempData, JsonArray jArray, Map<String, Object> cweInfo)
     {
-        tempData.addCWE(jArray);
+        tempData.addCWE(jArray, cweInfo);
     }
 
-    private void parseDescription(JsonArray jArray)
+    private void parseDescription(Data tempData, JsonArray jArray)
     {
         tempData.addDescription(jArray);
     }
 
-    private void parseCpe(JsonArray jArray)
+    private void parseCpe(Data tempData, JsonArray jArray)
     {
         tempData.addCpe23Uri(jArray);
     }

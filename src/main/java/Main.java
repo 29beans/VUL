@@ -40,6 +40,12 @@ public class Main {
     static private String macOutputPath="/Users/GyuMac/Desktop/회사/멘토링/data/output/";
     static private String winOutputPath = "C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/output/";
     static private File parsedOutputDir=new File(winOutputPath);
+
+    static private String macCWEcsv="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/CWE/";
+    static private String winCWEcsv="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/CWE/1000.csv";
+    static private File cweCSV=new File(winCWEcsv);
+
+    static private File cweToCveCSV = new File(cweCSV.getParentFile(),"cwe-cve.csv");
     //End of DataParser Setting
 
     private static int menu()
@@ -86,7 +92,7 @@ public class Main {
                     updt.update(updateDir);
                     break;
                 case 4:
-                    DataParser dp = new DataParser(jsonDataDir, parsedOutputDir);
+                    DataParser dp = new DataParser(jsonDataDir, parsedOutputDir, cweCSV, cweToCveCSV);
                     dp.parse();
                     break;
                 default:
