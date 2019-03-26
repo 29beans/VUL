@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 import com.google.gson.*;
 import java.util.Map;
 import java.util.HashMap;
@@ -38,7 +39,7 @@ public class Data {
         }
     }
 
-    public void addCWE(JsonArray ja, Map<String,Object> cweInfo)
+    public void addCWE(JsonArray ja, Map<String, Map<String, Object>> cweInfo)
     {
         for(JsonElement je: ja)
         {
@@ -48,6 +49,7 @@ public class Data {
             {
                 String CWE_ID=je_next.getAsJsonObject().get("value").getAsString();
                 CWE.put(CWE_ID, cweInfo.get(CWE_ID));
+                ((ArrayList<String>)cweInfo.get(CWE_ID).get("CVE_ID")).add(CVE_ID);
             }
         }
     }
@@ -100,7 +102,7 @@ public class Data {
 
     public Map<String, Object> createMap()
     {
-        map.put("CVE_ID", this.CVE_ID);
+        //map.put("CVE_ID", this.CVE_ID);
         map.put("Vendor_Data", this.vendorData);
         map.put("CWE_ID", this.CWE);
         map.put("Description", this.description);
