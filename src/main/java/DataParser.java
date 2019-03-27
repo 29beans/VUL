@@ -32,7 +32,7 @@ public class DataParser {
             parseDirList.add(dir);
     }
 
-    public void parse()
+    public static void parse()
     {
         parsingDirCheck();
         parseCweInfoFromCSV(cweInfo, cweCSV);
@@ -79,7 +79,7 @@ public class DataParser {
         recordCweToCve(cweToCve, cweInfo);
     }
 
-    public Map<String, Map<String, Object>> getSimilar(String cve_id)
+    public static Map<String, Map<String, Object>> getSimilar(String cve_id)
     {
         parseJson(dataDir);
 
@@ -108,6 +108,9 @@ public class DataParser {
             cve_list.addAll(cve_arr);
         }
 
+        cve_list.remove(cve_id);
+        System.out.println("Total # of similar cases: "+cve_list.size());
+        System.out.println(cve_list);
         for(String cve:cve_list)
         {
             if(similar.size() >=10)
@@ -118,13 +121,13 @@ public class DataParser {
         return similar;
     }
 
-    private String number(String cwe)
+    private static String number(String cwe)
     {
         int dash_idx=cwe.indexOf("-");
         return cwe.substring(dash_idx+1);
     }
 
-    public void parseJson(File dir)
+    public static void parseJson(File dir)
     {
         parseCweInfoFromCSV(cweInfo, cweCSV);
         Gson gson = new Gson();
@@ -134,7 +137,7 @@ public class DataParser {
         {
             if (jsonFile.getName().startsWith(".")) //To deal with file error in MacOS (.DS_STORE)
                 continue;
-
+            System.out.println("Parsing start... (File: "+jsonFile.getName()+")");
             JsonArray rootArr = null;
 
             try{ rootArr = gson.fromJson(new FileReader(jsonFile), JsonObject.class).get("CVE_Items").getAsJsonArray();}
@@ -157,14 +160,15 @@ public class DataParser {
 
                 dataMap.put(tempData.getCVE_ID(),tempData.createMap());
             }
+            System.out.println("Parsing finished... (File: "+jsonFile.getName()+")");
         }
     }
 
-    public void recordCweToCve(File cweToCve, Map<String, Map<String, Object>> cweInfo)
+    public static void recordCweToCve(File cweToCve, Map<String, Map<String, Object>> cweInfo)
     {
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(cweToCve));
-            CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("CWE_ID", "Name", "CVE_ID", "Related CWE_ID"));
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(cweToCve));
+             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("CWE_ID", "Name", "CVE_ID", "Related CWE_ID")))
+        {
             for(String key: cweInfo.keySet())
             {
                 csvPrinter.printRecord(key, cweInfo.get(key).get("Name"), cweInfo.get(key).get("CVE_ID"), cweInfo.get(key).get("Related Weaknesses"));
@@ -175,12 +179,11 @@ public class DataParser {
         }
     }
 
-    public void parseCweInfoFromCSV(Map<String, Map<String, Object>> cweInfo, File csv)
+    public static void parseCweInfoFromCSV(Map<String, Map<String, Object>> cweInfo, File csv)
     {
-        try {
-            Reader reader = new FileReader(csv);
-            CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader());
-
+        try(Reader reader = new FileReader(csv);
+            CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader()))
+        {
             for(CSVRecord csvRecord: csvParser)
             {
                 Map<String, Object> map = new HashMap<String, Object>();
@@ -189,7 +192,7 @@ public class DataParser {
                 splitWeaknesses(csvRecord.get("Related Weaknesses"),arr);
                 map.put("Related Weaknesses", arr);
                 map.put("CVE_ID", new ArrayList<String>());
-                cweInfo.put(csvRecord.get("CWE_ID"), map);
+                cweInfo.put(csvRecord.get("CWE-ID"), map);
             }
         }catch(FileNotFoundException e)
         {
@@ -201,7 +204,7 @@ public class DataParser {
         }
     }
 
-    private void splitWeaknesses(String weaknesses, ArrayList<String> arr)
+    private static void splitWeaknesses(String weaknesses, ArrayList<String> arr)
     {
         int start_idx=weaknesses.indexOf("CWE ID:");
         if(start_idx == -1)
@@ -219,7 +222,7 @@ public class DataParser {
         }
     }
 
-    public void parsingDirCheck()
+    public static void parsingDirCheck()
     {
         for(Iterator<String> it = parseDirList.iterator() ; it.hasNext() ; )
         {
@@ -229,53 +232,46 @@ public class DataParser {
         }
     }
 
-    public Map<String, Map<String, Object>> getDataList()
+    public static Map<String, Map<String, Object>> getDataList()
     {
         return dataMap;
     }
 
-    private void parseCVE(Data tempData, JsonObject jObject)
+    private static void parseCVE(Data tempData, JsonObject jObject)
     {
         tempData.setCVE_ID(jObject.get("ID").getAsString());
     }
 
-    private void parseVendorData(Data tempData, JsonArray jArray)
+    private static void parseVendorData(Data tempData, JsonArray jArray)
     {
         tempData.addVendorData(jArray);
     }
 
-    private void parseCWE(Data tempData, JsonArray jArray, Map<String, Map<String, Object>> cweInfo)
+    private static void parseCWE(Data tempData, JsonArray jArray, Map<String, Map<String, Object>> cweInfo)
     {
         tempData.addCWE(jArray, cweInfo);
     }
 
-    private void parseDescription(Data tempData, JsonArray jArray)
+    private static void parseDescription(Data tempData, JsonArray jArray)
     {
         tempData.addDescription(jArray);
     }
 
-    private void parseCpe(Data tempData, JsonArray jArray)
+    private static void parseCpe(Data tempData, JsonArray jArray)
     {
         tempData.addCpe23Uri(jArray);
     }
 
-    public void writeJsonResult(File jsonFile) throws IOException
+    public static void writeJsonResult(File jsonFile) throws IOException
     {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        FileWriter fw=null;
 
         if(!jsonFile.getParentFile().exists())
             jsonFile.getParentFile().mkdirs();
 
-        try
+        try(FileWriter fw=new FileWriter(jsonFile))
         {
-            fw=new FileWriter(jsonFile);
             gson.toJson(dataMap, fw);
         }catch(Exception e) {e.printStackTrace();}
-        finally
-        {
-            fw.close();
-            System.out.println("[Data Parsing] Done: "+jsonFile.getParentFile().getAbsolutePath());
-        }
     }
 }

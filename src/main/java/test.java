@@ -12,7 +12,7 @@ public class test {
         System.out.println(m.get("a"));
         System.out.println(m.get("a").get("a"));
         */
-
+        /*
         String a = "abcd";
         String b = new String("abcd");
 
@@ -24,10 +24,21 @@ public class test {
 
         Map<String, String> map = new HashMap<String, String>();
         map.put("abcd", "ABCD");
+        map.put(b, "aa");
 
         System.out.println(map.get("abcd"));
         System.out.println(map.get(a));
         System.out.println(map.get(b));
         System.out.println(map);
+        */
+
+        ArrayList<String> list = new ArrayList<String>();
+        list.add("a");
+        list.add("b");
+        list.add("c");
+
+        System.out.println(list.toArray());
+        System.out.println(list.toString());
+
     }
 }

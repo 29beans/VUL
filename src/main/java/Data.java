@@ -48,10 +48,18 @@ public class Data {
             for(JsonElement je_next: ja_next)
             {
                 String CWE_ID=je_next.getAsJsonObject().get("value").getAsString();
-                CWE.put(CWE_ID, cweInfo.get(CWE_ID));
-                ((ArrayList<String>)cweInfo.get(CWE_ID).get("CVE_ID")).add(CVE_ID);
+                CWE.put(CWE_ID, cweInfo.get(number(CWE_ID)));
+                //System.out.println(number(CWE_ID));
+                if(cweInfo.containsKey(number(CWE_ID)))
+                    ((ArrayList<String>)cweInfo.get(number(CWE_ID)).get("CVE_ID")).add(CVE_ID);
             }
         }
+    }
+
+    private static String number(String cwe)
+    {
+        int dash_idx=cwe.indexOf("-");
+        return cwe.substring(dash_idx+1);
     }
 
     public void addDescription(JsonArray ja)

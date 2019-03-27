@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -42,7 +43,7 @@ public class Main {
     static private File parsedOutputDir=new File(winOutputPath);
 
     static private String macCWEcsv="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/CWE/";
-    static private String winCWEcsv="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/CWE/1000.csv"; //***
+    static private String winCWEcsv="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/CWE/merged/2000.csv"; //***
     static private File cweCSV=new File(winCWEcsv);
 
     static private File similarCheckDir = new File(jsonDataDir, "2019-03-21");
@@ -83,7 +84,8 @@ public class Main {
         System.out.println("2. Decompress json zip files");
         System.out.println("3. Update the new data feeds from NVD");
         System.out.println("4. Parse the downloaded json data feeds");
-        System.out.println("5. Exit");
+        System.out.println("5. Get similar vulnerability instances with CVE-ID you enter");
+        System.out.println("6. Exit");
         System.out.println("---------------------------------------------------");
         System.out.print("Enter: ");
     }
@@ -117,7 +119,9 @@ public class Main {
                     break;
                 case 5:
                     DataParser checker = new DataParser(similarCheckDir, parsedOutputDir, cweCSV, cweToCveCSV);
-                    //checker.getSimilar();
+                    Map<String, Map<String, Object>> map= checker.getSimilar("CVE-2018-0001");
+                    System.out.println(map.keySet());
+                    System.out.println(map.toString());
                     break;
                 default:
                     System.out.println("Unexpected option input!");
