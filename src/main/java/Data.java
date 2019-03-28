@@ -1,9 +1,6 @@
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
+
 import com.google.gson.*;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
 
 public class Data {
 
@@ -12,6 +9,7 @@ public class Data {
     private Map<String, Object> CWE;
     private ArrayList<String> description;
     private ArrayList<String> cpe23Uri;
+    private Map<String, List<Object>> references;
 
     private Map<String, Object> map;
 
@@ -20,6 +18,7 @@ public class Data {
         CWE=new HashMap<String, Object>();    // key : value --> CWE_ID : vulnerability name
         description=new ArrayList<String>();
         cpe23Uri = new ArrayList<String>();
+        references=new HashMap<>();
 
         map=new HashMap<String, Object>();
     }
@@ -45,13 +44,21 @@ public class Data {
         {
             JsonArray ja_next=je.getAsJsonObject().get("description").getAsJsonArray();
 
-            for(JsonElement je_next: ja_next)
-            {
-                String CWE_ID=je_next.getAsJsonObject().get("value").getAsString();
-                CWE.put(CWE_ID, cweInfo.get(number(CWE_ID)));
+            for(JsonElement je_next: ja_next) {
+                Map<String, Object> cweMap = new HashMap<>();
+                String CWE_ID = je_next.getAsJsonObject().get("value").getAsString();
+                if(cweInfo.containsKey(number(CWE_ID))) {
+                    for (String key : cweInfo.get(number(CWE_ID)).keySet()) {
+                        if (key.equals("Related Vulnerabilities"))
+                            continue;
+                        cweMap.put(key, cweInfo.get(number(CWE_ID)).get(key));
+                    }
+                }
+
+                CWE.put(CWE_ID, cweMap);
                 //System.out.println(number(CWE_ID));
                 if(cweInfo.containsKey(number(CWE_ID)))
-                    ((ArrayList<String>)cweInfo.get(number(CWE_ID)).get("CVE_ID")).add(CVE_ID);
+                    ((ArrayList<String>)cweInfo.get(number(CWE_ID)).get("Related Vulnerabilities")).add(CVE_ID);
             }
         }
     }
@@ -108,13 +115,68 @@ public class Data {
         }
     }
 
+    public void addReferences()
+    {
+        Reference ref = new Reference();
+        Map<String, Map<String, Object>> refMap = ref.readRefMap();  //refName: {id: class}
+        Map<String, Map<String, String>> cweRefMap= ref.readCweReference(); //cwe: {refName: id}
+        Set<String> refNameSet = new HashSet<String>();
+        //System.out.println("--------- Start ----------");
+        //System.out.println(CVE_ID+" ///// "+CWE.keySet());
+        for(String cwe: CWE.keySet()) {
+            if (cweRefMap.containsKey(cwe))
+            {
+                //System.out.println("before: "+refNameSet);
+                //System.out.println(cweRefMap);
+                refNameSet.addAll(cweRefMap.get(cwe).keySet());
+                //System.out.println("after: "+refNameSet);
+            }
+
+            //else
+              //  System.out.println("[In function: addReferences] 'cweRefMap' does not have 'cwe': " + cwe);
+        }
+
+        //System.out.println(refNameSet);
+
+       for(String refName: refNameSet)
+        {
+            List<Object> arr = new ArrayList<>();
+            //System.out.println(refName+" " + CVE_ID+" "+CWE.keySet());
+            for(String cwe: CWE.keySet())
+            {
+                if(!cweRefMap.containsKey(cwe)) {
+                    //System.out.println("'cweRefMap' does not have cwe: "+cwe);
+                    continue;
+                }
+                try{
+                    String refID = cweRefMap.get(cwe).get(refName); // ref ID
+
+                    if(refMap.get(refName).containsKey(refID)) {
+                        arr.add(refMap.get(refName).get(refID));
+                        //System.out.println("ref name checked!");
+                    }
+                    //else
+                      //  System.out.println("[In function: addReferences] 'refMap' does not have 'refID': "+refID);
+                }catch(Exception e)
+                {
+                    System.out.println("ref ID null pointer error!");
+                    System.out.println("refName: "+refName);
+                    System.out.println("cwe: "+cwe);
+                    System.out.println("cwe Ref: "+cweRefMap.get(cwe));
+                }
+            }
+            references.put(refName,arr);
+        }
+    }
+
     public Map<String, Object> createMap()
     {
         //map.put("CVE_ID", this.CVE_ID);
         map.put("Vendor_Data", this.vendorData);
-        map.put("CWE_ID", this.CWE);
+        map.put("CWE", this.CWE);
         map.put("Description", this.description);
         map.put("CPE_2.3_Uri", this.cpe23Uri);
+        map.put("References", this.references);
 
         return map;
     }

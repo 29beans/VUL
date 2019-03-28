@@ -46,7 +46,7 @@ public class DataParser {
             {
                 if (jsonFile.getName().startsWith(".")) //To deal with file error in MacOS (.DS_STORE)
                     continue;
-
+                System.out.println("Parsing start... (File: "+jsonFile.getAbsolutePath()+")");
                 JsonArray rootArr = null;
 
                 try{ rootArr = gson.fromJson(new FileReader(jsonFile), JsonObject.class).get("CVE_Items").getAsJsonArray();}
@@ -68,6 +68,7 @@ public class DataParser {
                     parseCWE(tempData, cweArr, cweInfo);
                     parseDescription(tempData, dsctArr);
                     parseCpe(tempData, nodesArr);
+                    parseReferences(tempData);
 
                     dataMap.put(tempData.getCVE_ID(),tempData.createMap());
                 }
@@ -98,13 +99,13 @@ public class DataParser {
 
         for(String cwe: cwe_list)   //cwe format: "CWE-123"
         {
-            ArrayList<String> cve_arr = (ArrayList<String>) cweInfo.get(number(cwe)).get("CVE_ID");
+            ArrayList<String> cve_arr = (ArrayList<String>) cweInfo.get(number(cwe)).get("Related Vulnerabilities");
             cve_list.addAll(cve_arr);
         }
 
         for(String rel_cwe: related_cwe_list) //cwe format: "123"
         {
-            ArrayList<String> cve_arr = (ArrayList<String>) cweInfo.get(rel_cwe).get("CVE_ID");
+            ArrayList<String> cve_arr = (ArrayList<String>) cweInfo.get(rel_cwe).get("Related Vulnerabilities");
             cve_list.addAll(cve_arr);
         }
 
@@ -157,6 +158,7 @@ public class DataParser {
                 parseCWE(tempData, cweArr, cweInfo);
                 parseDescription(tempData, dsctArr);
                 parseCpe(tempData, nodesArr);
+                parseReferences(tempData);
 
                 dataMap.put(tempData.getCVE_ID(),tempData.createMap());
             }
@@ -167,11 +169,11 @@ public class DataParser {
     public static void recordCweToCve(File cweToCve, Map<String, Map<String, Object>> cweInfo)
     {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(cweToCve));
-             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("CWE_ID", "Name", "CVE_ID", "Related CWE_ID")))
+             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("CWE_ID", "Name", "Related Vulnerabilities", "Related Weaknesses")))
         {
             for(String key: cweInfo.keySet())
             {
-                csvPrinter.printRecord(key, cweInfo.get(key).get("Name"), cweInfo.get(key).get("CVE_ID"), cweInfo.get(key).get("Related Weaknesses"));
+                csvPrinter.printRecord(key, cweInfo.get(key).get("Name"), cweInfo.get(key).get("Related Vulnerabilities"), cweInfo.get(key).get("Related Weaknesses"));
             }
         }catch(IOException e)
         {
@@ -191,7 +193,7 @@ public class DataParser {
                 ArrayList<String> arr=new ArrayList<String>();
                 splitWeaknesses(csvRecord.get("Related Weaknesses"),arr);
                 map.put("Related Weaknesses", arr);
-                map.put("CVE_ID", new ArrayList<String>());
+                map.put("Related Vulnerabilities", new ArrayList<String>());
                 cweInfo.put(csvRecord.get("CWE-ID"), map);
             }
         }catch(FileNotFoundException e)
@@ -217,7 +219,7 @@ public class DataParser {
                 System.out.println("Error in extracting CWE-ID.... end_idx error!");
 
             String id= weaknesses.substring(start_idx+7, end_idx);
-            arr.add(id);
+            arr.add("CWE-"+id);
             splitWeaknesses(weaknesses.substring(end_idx), arr);
         }
     }
@@ -252,6 +254,11 @@ public class DataParser {
         tempData.addCWE(jArray, cweInfo);
     }
 
+    private static void parseReferences(Data tempData)
+    {
+        tempData.addReferences();
+    }
+
     private static void parseDescription(Data tempData, JsonArray jArray)
     {
         tempData.addDescription(jArray);
@@ -269,7 +276,7 @@ public class DataParser {
         if(!jsonFile.getParentFile().exists())
             jsonFile.getParentFile().mkdirs();
 
-        try(FileWriter fw=new FileWriter(jsonFile))
+        try(OutputStreamWriter fw=new OutputStreamWriter(new FileOutputStream(jsonFile), "UTF-8"))
         {
             gson.toJson(dataMap, fw);
         }catch(Exception e) {e.printStackTrace();}

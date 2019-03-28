@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class Main {
 
     //Below are the hard-coded absolute paths for json file input and output
-    //Modify the paths for your own convenience (***)
+    //Modify the paths for your own convenience (Marked: ***)
 
     // Parameter Setting for Crawler Class
     static private String macDownloadDir="/Users/GyuMac/Desktop/회사/멘토링/data/ZIP/";
@@ -40,13 +40,13 @@ public class Main {
 
     static private String macOutputPath="/Users/GyuMac/Desktop/회사/멘토링/data/output/";
     static private String winOutputPath = "C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/output/"; //***
-    static private File parsedOutputDir=new File(winOutputPath);
+    static private File parsedOutputDir=new File(winOutputPath);  //parsed output directory
 
     static private String macCWEcsv="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/CWE/";
     static private String winCWEcsv="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/CWE/merged/2000.csv"; //***
-    static private File cweCSV=new File(winCWEcsv);
+    static private File cweCSV=new File(winCWEcsv);  //CWE CSV file directory
 
-    static private File similarCheckDir = new File(jsonDataDir, "2019-03-21");
+    static private File similarCheckDir = new File(jsonDataDir, "2019-03-21");  //data parsing directory of getSimilar() method 
     static private File cweToCveCSV = new File(cweCSV.getParentFile(),"cwe-cve.csv");
     //End of DataParser Setting
 
@@ -119,9 +119,9 @@ public class Main {
                     break;
                 case 5:
                     DataParser checker = new DataParser(similarCheckDir, parsedOutputDir, cweCSV, cweToCveCSV);
-                    Map<String, Map<String, Object>> map= checker.getSimilar("CVE-2018-0001");
-                    System.out.println(map.keySet());
-                    System.out.println(map.toString());
+                    Map<String, Map<String, Object>> map= checker.getSimilar("CVE-2018-0001");   // 연관취약점 Top 10 리턴
+                    //System.out.println(map.keySet());
+                    //System.out.println(map.toString());
                     break;
                 default:
                     System.out.println("Unexpected option input!");
