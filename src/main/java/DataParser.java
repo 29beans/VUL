@@ -17,6 +17,9 @@ public class DataParser {
     private Data tempData;
 
     private Map<String, Map<String, Object>> cweInfo;
+    private Reference ref;
+    private Map<String, Map<String, Object>> refMap;  //refName: {id: class}
+    private Map<String, Map<String, String>> cweRefMap; //cwe: {refName: id}
 
 
     public DataParser(File jsonDataDir, File parsedOutputDir, File cweCsvFile, File cweToCveCsv)
@@ -29,6 +32,9 @@ public class DataParser {
         parseDirList = new ArrayList<>();
         for(String dir: dataDir.list())
             parseDirList.add(dir);
+        ref=new Reference();
+        refMap=ref.readRefMap();
+        cweRefMap=ref.readCweReference();
     }
 
     public void parse()
@@ -67,7 +73,7 @@ public class DataParser {
                     parseCWE(tempData, cweArr, cweInfo);
                     parseDescription(tempData, dsctArr);
                     parseCpe(tempData, nodesArr);
-                    parseReferences(tempData);
+                    parseReferences(tempData, refMap, cweRefMap);
 
                     dataMap.put(tempData.getCVE_ID(),tempData.createMap());
                 }
@@ -169,7 +175,7 @@ public class DataParser {
                 parseCWE(tempData, cweArr, cweInfo);
                 parseDescription(tempData, dsctArr);
                 parseCpe(tempData, nodesArr);
-                parseReferences(tempData);
+                parseReferences(tempData, refMap, cweRefMap);
 
                 dataMap.put(tempData.getCVE_ID(),tempData.createMap());
             }
@@ -230,7 +236,8 @@ public class DataParser {
                 System.out.println("Error in extracting CWE-ID.... end_idx error!");
 
             String id= weaknesses.substring(start_idx+7, end_idx);
-            arr.add("CWE-"+id);
+            if(!arr.contains("CWE-"+id))
+                arr.add("CWE-"+id);
             splitWeaknesses(weaknesses.substring(end_idx), arr);
         }
     }
@@ -265,9 +272,11 @@ public class DataParser {
         tempData.addCWE(jArray, cweInfo);
     }
 
-    private void parseReferences(Data tempData)
+    private void parseReferences(Data tempData,
+                                 Map<String, Map<String, Object>> refMap,
+                                 Map<String, Map<String, String>> cweRefMap)
     {
-        tempData.addReferences();
+        tempData.addReferences(refMap, cweRefMap);
     }
 
     private void parseDescription(Data tempData, JsonArray jArray)

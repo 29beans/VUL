@@ -115,11 +115,8 @@ public class Data {
         }
     }
 
-    public void addReferences()
+    public void addReferences(Map<String, Map<String, Object>> refMap, Map<String, Map<String, String>> cweRefMap)
     {
-        Reference ref = new Reference();
-        Map<String, Map<String, Object>> refMap = ref.readRefMap();  //refName: {id: class}
-        Map<String, Map<String, String>> cweRefMap= ref.readCweReference(); //cwe: {refName: id}
         Set<String> refNameSet = new HashSet<String>();
         //System.out.println("--------- Start ----------");
         //System.out.println(CVE_ID+" ///// "+CWE.keySet());
