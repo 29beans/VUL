@@ -7,12 +7,12 @@ import java.util.Map;
 
 public class Reference {
 
-    static private String macCSVdir="/Users/GyuMac/Desktop/reference/";
-    static private String winCSVdir="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/reference";
-    static private File referenceCSVdir= new File(winCSVdir);
+    private String macCSVdir="/Users/GyuMac/Desktop/reference/";
+    private String winCSVdir="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/reference";
+    private File referenceCSVdir= new File(winCSVdir);
 
-    static private Map<String, Map<String, Object>> refMap = new HashMap<>(); // refName: {refID: class(record)}
-    static private Map<String, Map<String, String>> cweRefMap= new HashMap<>(); // cwe: {refName: refID}
+    private Map<String, Map<String, Object>> refMap = new HashMap<>(); // refName: {refID: class(record)}
+    private Map<String, Map<String, String>> cweRefMap= new HashMap<>(); // cwe: {refName: refID}
 
     private class SDSG
     {
@@ -211,10 +211,7 @@ public class Reference {
                     map.put(csvRecord.get(0), temp);
                 }
             }
-        }catch(IOException e)
-        {
-            e.printStackTrace();
-        }
+        }catch(IOException e) { e.printStackTrace(); }
 
         return map;
     }

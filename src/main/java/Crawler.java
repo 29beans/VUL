@@ -13,18 +13,18 @@ import java.text.SimpleDateFormat;
 public class Crawler {
 
     final static int size = 1024*8;
-    static private String fileName;
-    static private File downloadDir;
+    private String fileName;
+    private File downloadDir;
 
-    static private String defaultAddress= "https://nvd.nist.gov/feeds/json/cve/1.0/nvdcve-1.0-";
-    static private String[] version={"2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012","2013","2014","2015","2016","2017","2018","2019","recent", "modified"};
+    private String defaultAddress= "https://nvd.nist.gov/feeds/json/cve/1.0/nvdcve-1.0-";
+    private String[] version={"2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012","2013","2014","2015","2016","2017","2018","2019","recent", "modified"};
 
-    static private String fileFormat=".json.zip";
-    static private String downloadDate;
+    private String fileFormat=".json.zip";
+    private String downloadDate;
 
-    static private String updateUrl = "https://nvd.nist.gov/vuln/data-feeds";
-    static private Map<String,String> updateMsg =  new HashMap<String, String>();
-    static private Map<String, File> logFile = new HashMap<String, File>();
+    private String updateUrl = "https://nvd.nist.gov/vuln/data-feeds";
+    private Map<String,String> updateMsg =  new HashMap<String, String>();
+    private Map<String, File> logFile = new HashMap<String, File>();
 
     public Crawler(File crawlDir)
     {
@@ -32,7 +32,10 @@ public class Crawler {
         downloadDir=new File(crawlDir,downloadDate);
     }
 
-    public static void fileUrlDownload(String fileAddress, String localFileName)
+    public Crawler()
+    { }
+
+    public void fileUrlDownload(String fileAddress, String localFileName)
     {
         OutputStream outStream = null;
         URLConnection uCon = null;
@@ -81,7 +84,7 @@ public class Crawler {
         }
     }
 
-    public static void downloadSetting(String fileAddress)
+    public void downloadSetting(String fileAddress)
     {
         int slashIndex = fileAddress.lastIndexOf('/');
         int periodIndex= fileAddress.lastIndexOf('.');
@@ -94,14 +97,14 @@ public class Crawler {
         }
     }
 
-    public static void timeLog()
+    public void timeLog()
     {
         Date today=new Date();
         SimpleDateFormat date=new SimpleDateFormat("yyyy-MM-dd");
         downloadDate=date.format(today);
     }
 
-    public static void updateTimeCheck(Map<String, String> updateMsg)
+    public void updateTimeCheck(Map<String, String> updateMsg)
     {
         Document doc = null;
         try{
@@ -120,7 +123,7 @@ public class Crawler {
         updateMsg.put("CVE_Recent", cve_recent_update_time);
     }
 
-    public static void updateLog()
+    public void updateLog()
     {
         FileWriter fw_modified=null;
         FileWriter fw_recent=null;
@@ -150,18 +153,18 @@ public class Crawler {
         }
     }
 
-    public static void setVersion(String[] ver)
+    public void setVersion(String[] ver)
     {
         version = ver;
     }
 
-    public static void setLogFile(File modified_log_file, File recent_log_file)
+    public void setLogFile(File modified_log_file, File recent_log_file)
     {
         logFile.put("CVE_Modified", modified_log_file);
         logFile.put("CVE_Recent", recent_log_file);
     }
 
-    public static void crawl(File modified_log_file, File recent_log_file)
+    public void crawl(File modified_log_file, File recent_log_file)
     {
         for(String ver:version)
         {

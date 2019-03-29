@@ -7,12 +7,12 @@ import java.util.*;
 
 public class CweMerger {
 
-    static private File cweCsvDir= new File("C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/CWE/files/");
-    static private File outputCSV= new File("C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/CWE/merged/merged.csv");
-    static private ArrayList<String> header= new ArrayList<String>();
-    static private Map<Integer, ArrayList<String>> map = new HashMap<Integer, ArrayList<String>>();
+    private File cweCsvDir= new File("C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/CWE/files/");
+    private File outputCSV= new File("C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/CWE/merged/merged.csv");
+    private ArrayList<String> header= new ArrayList<String>();
+    private Map<Integer, ArrayList<String>> map = new HashMap<Integer, ArrayList<String>>();
 
-    public static void mergeCWE(File cweDir)
+    public void mergeCWE(File cweDir)
     {
         for(File cweFile: cweDir.listFiles())
         {
@@ -53,7 +53,7 @@ public class CweMerger {
         }
     }
 
-    public static void sortPrint()
+    public void sortPrint()
     {
         SortedSet<Integer> sortedKeys = new TreeSet<>(map.keySet());
         try( BufferedWriter writer =  new BufferedWriter(new FileWriter(outputCSV)); CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT))
@@ -70,10 +70,11 @@ public class CweMerger {
         }
     }
 
+    /*
     public static void main(String[] args) {
         CweMerger merger = new CweMerger();
         merger.mergeCWE(cweCsvDir);
         System.out.println("merged size: "+map.size());
         merger.sortPrint();
-    }
+    }*/
 }

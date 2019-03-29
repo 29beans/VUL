@@ -5,49 +5,34 @@ import java.util.Scanner;
 
 public class Main {
 
-    //Below are the hard-coded absolute paths for json file input and output
-    //Modify the paths for your own convenience (Marked: ***)
+    /* ************************************************************************ */
+    /* ************* Modify below path for your own convenience!! ************* */
+    static private String rootPath="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/";
+    /* ************************************************************************ */
 
     // Parameter Setting for Crawler Class
-    static private String macDownloadDir="/Users/GyuMac/Desktop/회사/멘토링/data/ZIP/";
-    static private String winDownloadDir="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/ZIP/";  //***
-    static private File crawlingDir=new File(winDownloadDir);
+    static private File crawlingDir=new File(rootPath+"/ZIP/");
     //End of Crawler Setting
 
     // Parameter Setting for Decompressor Class
-    static private String macFileDir=macDownloadDir;
-    static private String winFileDir=winDownloadDir;
-    static private File zipFileDir=new File(winFileDir);
-
-    static private String macOutputDir="/Users/GyuMac/Desktop/회사/멘토링/data/JSON/";
-    static private String winOutputDir="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/JSON/"; //***
-    static private File decompressDir=new File(winOutputDir);
+    static private File zipFileDir=crawlingDir;
+    static private File decompressDir=new File(rootPath+"/JSON/");
     //End of Decompressor Setting
 
     // Parameter Setting for Updater Class
     static private File updateDir = crawlingDir;
-    static private String macUpdateLogPath ="/Users/GyuMac/Desktop/회사/멘토링/data/";
-    static private String winUpdateLogPath = "C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/Update_Log/"; //***
-    static private File updateLogPath = new File(winUpdateLogPath);
+    static private File updateLogPath = new File(rootPath+"/update_log/");
     static private File cve_modified_update_log_file = new File(updateLogPath,"cve_modified_update_log.txt");
     static private File cve_recent_update_log_file = new File(updateLogPath,"cve_recent_update_log.txt");
     //End of Updater Setting
 
     // Parameter Setting for DataParser Class
-    static private String macDataPath="/Users/GyuMac/Desktop/회사/멘토링/data/JSON/";
-    static private String winDataPath="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/JSON/"; //***
-    static private File jsonDataDir=new File(winDataPath);
+    static private File jsonDataDir=new File(rootPath+"/JSON/");
+    static private File parsedOutputDir=new File(rootPath+"/output/");  //parsed output directory
 
-    static private String macOutputPath="/Users/GyuMac/Desktop/회사/멘토링/data/output/";
-    static private String winOutputPath = "C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/output/"; //***
-    static private File parsedOutputDir=new File(winOutputPath);  //parsed output directory
-
-    static private String macCWEcsv="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/CWE/";
-    static private String winCWEcsv="C:/Users/2019_NEW_07/Desktop/과제_멘토링/data/CWE/merged/2000.csv"; //***
-    static private File cweCSV=new File(winCWEcsv);  //CWE CSV file directory
-
-    static private File similarCheckDir = new File(jsonDataDir, "2019-03-21");  //data parsing directory of getSimilar() method 
-    static private File cweToCveCSV = new File(cweCSV.getParentFile(),"cwe-cve.csv");
+    static private File cweCSV=new File(rootPath+"/CWE/merged/2000.csv");  //CWE CSV file directory
+    static private File similarCheckDir = new File(jsonDataDir, "2019-03-21");  //data parsing directory of getSimilar() method
+    static private File cweToCveCSV = new File(rootPath+"/CWE/merged/","cwe-cve.csv");
     //End of DataParser Setting
 
     private static int menu()
@@ -116,12 +101,13 @@ public class Main {
                 case 4:
                     DataParser dp = new DataParser(jsonDataDir, parsedOutputDir, cweCSV, cweToCveCSV);
                     dp.parse();
+                    // WHERE YOU WANT TO GET DATA = dp.getDataMap();
                     break;
                 case 5:
                     DataParser checker = new DataParser(similarCheckDir, parsedOutputDir, cweCSV, cweToCveCSV);
-                    Map<String, Map<String, Object>> map= checker.getSimilar("CVE-2018-0001");   // 연관취약점 Top 10 리턴
-                    //System.out.println(map.keySet());
-                    //System.out.println(map.toString());
+                    checker.parseJson();
+                    Map<String, Map<String, Object>> map= checker.getSimilar("CVE-2019-0001"); // 연관취약점 Top 10 리턴
+                    System.out.println(map);
                     break;
                 default:
                     System.out.println("Unexpected option input!");

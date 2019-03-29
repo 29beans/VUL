@@ -8,11 +8,11 @@ import java.util.ArrayList;
 
 public class Decompressor {
 
-    static private File zipFileDir;
-    static private File decompressDir;
+    private File zipFileDir;
+    private File decompressDir;
 
-    static private File[] folderList;
-    static private ArrayList<File[]> zipFileList = new ArrayList<>();
+    private File[] folderList;
+    private ArrayList<File[]> zipFileList = new ArrayList<>();
 
     public Decompressor(File zipDir, File decompDir)
     {
@@ -20,7 +20,7 @@ public class Decompressor {
         decompressDir = decompDir;
     }
 
-    public static void decompress()
+    public void decompress()
     {
         decompressSetting();
 
@@ -43,7 +43,7 @@ public class Decompressor {
         }
     }
 
-    public static void decompressSetting()
+    public void decompressSetting()
     {
         folderList=zipFileDir.listFiles();
 
@@ -60,7 +60,7 @@ public class Decompressor {
         }
     }
 
-    public static void unzip(File zipFile, File unzipDir) throws Throwable
+    public void unzip(File zipFile, File unzipDir) throws Throwable
     {
         FileInputStream fis =null;
         ZipInputStream zis = null;
@@ -94,7 +94,7 @@ public class Decompressor {
         }
     }
 
-    private static void createFile(File file, ZipInputStream zis) throws Throwable
+    private void createFile(File file, ZipInputStream zis) throws Throwable
     {
         File parentDir = new File(file.getParent());
 

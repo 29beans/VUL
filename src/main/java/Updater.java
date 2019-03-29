@@ -12,23 +12,24 @@ import org.apache.commons.io.input.ReversedLinesFileReader;
 
 
 public class Updater {
-    static private String updateDate;
-    static private String[] updatedVersion = {"recent", "modified"};
-    static private String updateUrl = "https://nvd.nist.gov/vuln/data-feeds";
-    static private File cve_modified_log_file;
-    static private File cve_recent_log_file;
-    static private Map<String, String> updateMsg =  new HashMap<String, String>();
-    static private String lastModifiedUpdateTime;
-    static private String lastRecentUpdateTime;
+    private String updateDate;
+    private String[] updatedVersion = {"recent", "modified"};
+    private String updateUrl = "https://nvd.nist.gov/vuln/data-feeds";
+    private File cve_modified_log_file;
+    private File cve_recent_log_file;
+    private Map<String, String> updateMsg =  new HashMap<String, String>();
+    private String lastModifiedUpdateTime;
+    private String lastRecentUpdateTime;
 
     public Updater(File modified_log_file, File recent_log_file) {
         cve_modified_log_file = modified_log_file;
         cve_recent_log_file = recent_log_file;
     }
 
-    public static boolean updateNecessary()
+    public boolean updateNecessary()
     {
-        Crawler.updateTimeCheck(updateMsg);
+        (new Crawler()).updateTimeCheck(updateMsg);
+
         try{
             ReversedLinesFileReader tailReader1 = new ReversedLinesFileReader(cve_modified_log_file, Charset.forName("UTF-8"));
             ReversedLinesFileReader tailReader2 = new ReversedLinesFileReader(cve_recent_log_file, Charset.forName("UTF-8"));
@@ -46,7 +47,7 @@ public class Updater {
             return false;
     }
 
-    public static void update(File updateDir)
+    public void update(File updateDir)
     {
         if(updateNecessary()) {
             Crawler crwl = new Crawler(updateDir);

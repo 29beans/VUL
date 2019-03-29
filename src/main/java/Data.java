@@ -9,7 +9,7 @@ public class Data {
     private Map<String, Object> CWE;
     private ArrayList<String> description;
     private ArrayList<String> cpe23Uri;
-    private Map<String, List<Object>> references;
+    private Map<String, Object> references;
 
     private Map<String, Object> map;
 
@@ -63,7 +63,7 @@ public class Data {
         }
     }
 
-    private static String number(String cwe)
+    private String number(String cwe)
     {
         int dash_idx=cwe.indexOf("-");
         return cwe.substring(dash_idx+1);
@@ -173,9 +173,10 @@ public class Data {
     {
         //map.put("CVE_ID", this.CVE_ID);
         map.put("Vendor_Data", this.vendorData);
-        map.put("CWE", this.CWE);
+        //map.put("CWE", this.CWE);
         map.put("Description", this.description);
         map.put("CPE_2.3_Uri", this.cpe23Uri);
+        this.references.put("CWE", this.CWE);
         map.put("References", this.references);
 
         return map;
